@@ -1,0 +1,46 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+```{r}
+library(twitteR)
+options(httr_oauth_cache=F)
+API_KEY <- "E7jFmHkJSAIsPLfiO3zsS3zyD"
+API_SECRET <- "7zuL9Dir42KzWnGzMmuahDpXQR6tvQUvIxBXQTwNMIbu5BxHXC"
+ACCESS_TOKEN <- "961044767588192256-k0hKJQvYegnNIi9D12ZwXBiJn5qRXaX"
+ACCESS_SECRET <- "2PFxOaLVU67TuwF4x4N8RteMTOzSmcdETFVJ5kA4BFA3J"
+
+setup_twitter_oauth(API_KEY, API_SECRET, ACCESS_TOKEN, ACCESS_SECRET)
+tweets <- searchTwitter("bitcoin -filter:retweets", n=10000, since='2018-03-01', until='2018-03-31') 
+# tweets collected for keywords bitcoin, blockchain and cryptocurrency
+tweets_df <- twListToDF(unique(tweets))
+write.csv(tweets_df, file="bitcoinTwitter.csv")
+```
+```{r}
+# write tweet text from csv to text file
+tweetsData <- read.csv(file.choose())
+tweetsText <- tweetsData$text
+
+twitterFile = "bitcoinData.txt"
+# File conversion for 3 keywords - bitcoin, blockchain and cryptocurrency
+for(text in tweetsText){
+ cat(text, file=twitterFile, append=TRUE, sep = " ")
+}
+  
+```
+

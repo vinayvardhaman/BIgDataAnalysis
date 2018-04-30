@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="words.js"></script>
+<head>
+    <title>Word Cloud - Data Extracted from Twitter and NYTimes</title>
+</head>
+<style>
+    body {
+        font-family:"Lucida Grande","Droid Sans",Arial,Helvetica,sans-serif;
+    }
+    .legend {
+        border: 1px solid #555555;
+        border-radius: 5px 5px 5px 5px;
+        font-size: 0.8em;
+        margin: 10px;
+        padding: 8px;
+    }
+
+    .bld {
+        font-weight: bold;
+    }
+
+   
+</style>
+
+<body>
+  <h3> Word Cloud for the Data Collected</h3>
+
+  <span>Choose the Word &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+  <span>Choose the Type</span>
+  <div>
+      <select id="Word" onchange="RunWordCloud()">
+        <option>--Select Word--</option>
+        <option value="BlockChain">BlockChain</option>
+        <option value="CryptoCurrency">CryptoCurrency</option>
+        <option value="Bitcoin">Bitcoin</option>
+      </select>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <select id="Type" onchange="RunWordCloud()">         
+          <option value="WordCount" selected>WordCount</option>
+          <option value="CoOccurrance">CoOccurrance</option>
+      </select>
+  </div>
+
+  <h4 id = "H2"></h4>
+  <div id="cloud"> </div>
+  <h4 id = "H3"></h4>
+  <div id="cloud2"> </div>  
+
+  <p id = "note"></p>
+  
+
+</body>
+
+
+<script>
+    var list1, list2, word_list1, word_list2, word_ist3, word_list4, word_list5, word_list6;
+    var pair_list1, pair_list2, pair_list3, pair_list4, pair_list5, pair_list6;
+
+     d3.csv("blockchain_wordcount_nytimes.csv", function(data) 
+            {
+                word_list1 = data.slice(0,200);
+            });
+     d3.csv("blockchain_wordcount_twitter.csv", function(data)
+             {
+                 word_list2 = data.slice(0,200);
+             });
+     d3.csv("cryptocurrency_wordcount_nytimes.csv", function(data)
+             {
+                 word_list3 = data.slice(0,200);
+             });
+     d3.csv("cryptocurrency_wordcount_twitter.csv", function(data)
+             {
+                 word_list4 = data.slice(0,200);
+             });
+     d3.csv("bitcoin_wordcount_nytimes.csv", function(data)
+             {
+                 word_list5 = data.slice(0,200);
+             });
+     d3.csv("bitcoin_wordcount_twitter.csv", function(data)
+             {
+                 word_list6 = data.slice(0,200);
+             });
+
+     d3.csv("blockchain_pairs_nytimes.csv", function(data) 
+            {
+                for(var i =0;i<data.length;i++)
+                    data[i].size = data[i].size/100;
+
+                pair_list1 = data;
+            });
+     d3.csv("blockchain_pairs_twitter.csv", function(data)
+             {
+                 for(var i =0;i<data.length;i++)
+                    data[i].size = data[i].size/100;
+
+                pair_list2 = data;
+             });
+     d3.csv("cryptocurrency_pairs_nytimes.csv", function(data)
+             {                 
+                for(var i =0;i<data.length;i++)
+                    data[i].size = data[i].size/100;
+
+                pair_list3 = data;
+                
+             });
+     d3.csv("cryptocurrency_pairs_twitter.csv", function(data)
+             {              
+
+                for(var i=0;i<data.length;i++)
+                    data[i].size = data[i].size/100;
+
+                pair_list4 = data;
+                
+             });
+     d3.csv("bitcoin_pairs_nytimes.csv", function(data)
+             {
+                for(var i=0;i<data.length;i++)
+                    data[i].size = data[i].size/100;
+
+                 pair_list5 = data;
+             });
+     d3.csv("bitcoin_pairs_twitter.csv", function(data)
+             {
+                for(var i=0;i<data.length;i++)
+                    data[i].size = data[i].size/100;
+
+                 pair_list6 = data;
+             });
+
+
+    var color = d3.scale.linear()
+            .domain([0,1,2,3,4,5,6,10,15,20,100])
+            .range(["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222"]);
+
+
+
+    function RunWordCloud() {
+         document.getElementById("note").innerHTML = "Note: Higher Frequeny words are larger and slightly faded in color.  Lesser frequency words are smaller and darker";
+         document.getElementById("H2").innerHTML = "NYTimes Data Cloud";
+         document.getElementById("H3").innerHTML = "Twitter Data Cloud";
+
+        if(Word.value == "BlockChain" && Type.value == "WordCount")
+        {
+           list1 = word_list1;
+           list2 = word_list2;        
+                    
+        }
+        else if(Word.value == "BlockChain" && Type.value == "CoOccurrance")
+        {              
+           list1 = pair_list1;
+           list2 = pair_list2;  
+                     
+        }
+         else if(Word.value == "CryptoCurrency" && Type.value == "WordCount")
+        {              
+           list1 = word_list3;
+           list2 = word_list4;                         
+                     
+        }
+         else if(Word.value == "CryptoCurrency" && Type.value == "CoOccurrance")
+        {              
+           list1 = pair_list3;
+           list2 = pair_list4;  
+                     
+        }
+         else if(Word.value == "Bitcoin" && Type.value == "WordCount")
+        {              
+           list1 = word_list5;
+           list2 = word_list6;  
+                     
+        }
+         else if(Word.value == "Bitcoin" && Type.value == "CoOccurrance")
+        {              
+           list1 = pair_list5;
+           list2 = pair_list6;  
+                     
+        }
+        document.getElementById("cloud").innerHTML = "";
+        document.getElementById("cloud2").innerHTML = "";
+        
+        d3.layout.cloud().size([800, 300])
+            .words(list1)
+            .rotate(0)
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw)
+            .start();
+
+       d3.layout.cloud().size([800, 300])
+            .words(list2)
+            .rotate(0)
+            .fontSize(function(d) { return d.size; })
+            .on("end", draw2)
+            .start();
+    
+    }
+
+    function draw(words) {
+    
+        d3.select("#cloud").append("svg")
+                .attr("width", 850)
+                .attr("height", 350)
+                .attr("class", "wordcloud")
+                .append("g")
+                // without the transform, words words would get cutoff to the left and top, they would
+                // appear outside of the SVG area
+                .attr("transform", "translate(320,200)")
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function(d) { return d.size + "px"; })
+                .style("fill", function(d, i) { return color(i); })
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; });
+    }
+
+    function draw2(words) {
+        d3.select("#cloud2").append("svg")
+                .attr("width", 850)
+                .attr("height", 350)
+                .attr("class", "wordcloud")
+                .append("g")
+                // without the transform, words words would get cutoff to the left and top, they would
+                // appear outside of the SVG area
+                .attr("transform", "translate(320,200)")
+                .selectAll("text")
+                .data(words)
+                .enter().append("text")
+                .style("font-size", function(d) { return d.size + "px"; })
+                .style("fill", function(d, i) { return color(i); })
+                .attr("transform", function(d) {
+                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+                })
+                .text(function(d) { return d.text; });
+    }
+
+
+</script>
+
+</html>
